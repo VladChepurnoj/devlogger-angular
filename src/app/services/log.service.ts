@@ -1,33 +1,82 @@
-import { Injectable } from "@angular/core";
-import { BehaviorSubject } from "rxjs/BehaviorSubject";
-import { Observable } from "rxjs/Observable";
-import { of } from "rxjs/observable/of";
-import { Log } from "../models/Log";
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
+import { Observable } from 'rxjs/Observable';
+import { of } from 'rxjs/observable/of';
+
+import { Log } from '../models/Log';
 
 @Injectable()
 export class LogService {
   logs: Log[];
 
-  private logSourse = new BehaviorSubject<Log>({
-    id: null,
-    text: null,
-    date: null,
-  });
-  selectedLog = this.logSourse.asObservable();
+  private logSource = new BehaviorSubject<any>([]);
+  selectedLog = this.logSource.asObservable();
 
-  constructor() {
-    this.logs = [
-      { id: "1", text: "Gen comp", date: new Date("12/23/2022 14:25:52") },
-      { id: "2", text: "Added boot", date: new Date("12/24/2022 17:26:52") },
-      { id: "3", text: "Logs comp", date: new Date("12/25/2022 13:25:52") },
-    ];
+  private stateSource = new BehaviorSubject<Boolean>(true); 
+
+  stateClear = this.stateSource.asObservable();
+
+  constructor() { 
+    // this.logs = [
+    //   {id: '1', text: 'Generated components', date: new Date('12/26/2017 12:54:23')},
+    //   {id: '2', text: 'Added Bootstrap', date: new Date('12/27/2017 9:33:13')},
+    //   {id: '3', text: 'Added logs component', date: new Date('12/27/2017 12:00:23')}
+    // ]
+
+    this.logs = [];
   }
 
   getLogs(): Observable<Log[]> {
-    return of(this.logs);
+    if (localStorage.getItem('logs') === null) {
+      this.logs = [];
+    } else {
+       this.logs = JSON.parse(localStorage.getItem('logs'));
+    }
+    return of(this.logs.sort((a, b) => {
+      return b.date = a.date;
+    }));
   }
 
   setFormLog(log: Log) {
-    this.logSourse.next(log);
+    this.logSource.next(log);
   }
+
+  addLog(log: Log) {
+    this.logs.unshift(log);
+
+    // Adds data to local storage
+    localStorage.setItem('logs', JSON.stringify 
+  (this.logs));
+  }
+
+  updateLog(log: Log) {
+    this.logs.forEach((cur, index) => {
+      if(log.id === cur.id) {
+        this.logs.splice(index, 1);
+      }
+    });
+    this.logs.unshift(log);
+
+    // Updates local storage
+    localStorage.setItem('logs', JSON.stringify 
+  (this.logs));
+  }
+
+  deleteLog(log: Log) {
+    this.logs.forEach((cur, index) => {
+      if(log.id === cur.id) {
+        this.logs.splice(index, 1);
+      }
+    });
+
+    // Deletes data to local storage
+    localStorage.setItem('logs', JSON.stringify 
+  (this.logs));
+  }
+
+  clearState() {
+    this.stateSource.next(true)
+  }
+
 }

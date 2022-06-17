@@ -1,4 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
+import { of } from 'rxjs/observable/of';
+import { Subject } from 'rxjs/Subject';
+
 
 @Component({
   selector: 'app-root',
@@ -7,4 +12,7 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'app';
+  myArray= [] = ['a','b','c','z']
+ 
+ 
 }
